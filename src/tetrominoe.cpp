@@ -68,8 +68,8 @@ Tetrominoe::Tetrominoe(){
         break;
     }
 }
-
-void Tetrominoe::moveLeft(){ //esto esta mal, tira segmentation fault a veces
+ 
+void Tetrominoe::moveLeft(){ 
     bool move = true;
     for(int i = 0; i< numberBlocks; i++){
         if(blocks[i].getX() - 1 < 0){ //collision

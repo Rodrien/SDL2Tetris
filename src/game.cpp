@@ -95,6 +95,28 @@ Tetrominoe* Game::getCurrent(){
     return current;
 }
 
+void Game::clearRow(){
+
+}
+
+bool Game::youLose(){ //hacer
+
+    return false;
+}
+
+bool Game::lowerCurrent(){ //colision con los colores 
+    Block* squares = current->getBlocks();
+    int cantidadBloques = current->getNumberBlocks();
+
+    for(int i = 0; i< cantidadBloques; i++){
+        int* rgb = blocks[squares[i].getX()][squares[i].getY()+1].getColor();
+        if(rgb[0]!=255 || rgb[1]!=255 || rgb[2]!=255){ //collision with other blocks
+            return false;
+        }
+    }
+    return true;
+}
+
 void Game::input(){
     SDL_Event e;
     while(SDL_PollEvent(&e)){ //si apreto la cruz roja de la ventana
@@ -104,10 +126,14 @@ void Game::input(){
     if(keyStates[SDL_SCANCODE_ESCAPE]) running = false; //si apreto la tecla de escape
     if(keyStates[SDL_SCANCODE_F]) fullScreen = !fullScreen; //si apreto la tecla F
     if(keyStates[SDL_SCANCODE_LEFT]){
-        current->moveLeft();
+        if(current != NULL){
+            current->moveLeft();
+        }
     }
     if(keyStates[SDL_SCANCODE_RIGHT]){
-        current->moveRight();
+        if(current != NULL){
+            current->moveRight();
+        }
     }
     //if(keyStates[SDL_SCANCODE_DOWN]){
     //    current->moveDown();
@@ -169,19 +195,6 @@ void Game::draw(){
         SDL_Delay((1000/maxFPS)-timerFPS);
     }
     //---------------------
-}
-
-bool Game::lowerCurrent(){ //colision con los colores 
-    Block* squares = current->getBlocks();
-    int cantidadBloques = current->getNumberBlocks();
-
-    for(int i = 0; i< cantidadBloques; i++){
-        int* rgb = blocks[squares[i].getX()][squares[i].getY()+1].getColor();
-        if(rgb[0]!=255 || rgb[1]!=255 || rgb[2]!=255){ //collision with other blocks
-            return false;
-        }
-    }
-    return true;
 }
 
 void Game::update(){
