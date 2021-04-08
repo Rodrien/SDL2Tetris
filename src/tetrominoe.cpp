@@ -19,8 +19,8 @@ Tetrominoe::Tetrominoe(){
         }
         blocks[0].setPosition(4,0);
         blocks[1].setPosition(5,0);
-        blocks[2].setPosition(4,1);
-        blocks[3].setPosition(5,1);
+        blocks[2].setPosition(4,-1);
+        blocks[3].setPosition(5,-1);
         break;
     case 1: //inverted T
         blocks = new Block[4];
@@ -103,10 +103,6 @@ bool Tetrominoe::moveDown(){
         if(blocks[i].getY() + 1 >= ROWS){ //bottom collision
             move = false;
         }
-        //int* rgb = grid[blocks[i].getX()][blocks[i].getY()+1]->getColor();
-        //if(rgb[0]!=255 && rgb[1]!=255 && rgb[2]!=255){ //collision with other blocks
-        //    move = false;
-        //}
     }
     if(move){
         for(int i = 0; i< numberBlocks; i++){

@@ -30,9 +30,13 @@ class Game{
     int getScore();
     bool isRunning();
     bool lowerCurrent();
-    bool youLose(); //cuando llega hasta arriba
-    void clearRow(); //para cuando toca limpiar la fila
+    bool leftCurrent(); 
+    bool rightCurrent(); 
 
+    bool youLose(); 
+    void clearRow(); //para cuando toca limpiar la fila
+    void lowerAll(); //lower the grid after clearing
+    
     void setLastFrame(int);
     void setLastTime(int);
     void setFPS(int);

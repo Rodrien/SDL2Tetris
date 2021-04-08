@@ -2,7 +2,7 @@
 #include "../include/game.h"
 
 Game::Game(){
-    maxFPS = 60;
+    maxFPS = 10;
     running = false;
     score = lastFrame = fps = frameCount = 0;
     current = NULL;
@@ -95,16 +95,52 @@ Tetrominoe* Game::getCurrent(){
     return current;
 }
 
-void Game::clearRow(){
-
+void Game::clearRow(){ //this can be optimized (X,Y)
+    //bottom row number is ROWS
+    int go = 0;
+    int rowSelected = ROWS-1;
+    while(rowSelected >= 0){ 
+        bool add = true;
+        for(int i = 0; i< COLUMNS;i++){ //if there is a white block in the row
+            int* color = blocks[i][rowSelected].getColor();
+            if(color[0] == 255 && color[1] == 255 && color[2] == 255){ //white block
+                add = false;
+            }
+            delete[] color;
+        }
+        if(add){
+            go++;
+            for(int i = 0; i< COLUMNS; i++){
+                blocks[i][rowSelected].setColor(255,255,255); //make the row white
+            }
+        }
+        rowSelected--;
+    }
+    while(go!=0){ //lower the rest of the rows
+        this->growScore(1);
+        for(int i = ROWS-1; i > 0; i--){
+            for(int j = 0; j < COLUMNS; j++){
+                int* rgb = blocks[j][i-1].getColor();
+                blocks[j][i].setColor(rgb[0],rgb[1],rgb[2]);
+                delete[] rgb;
+            }
+        }
+        go--;
+    }
 }
 
-bool Game::youLose(){ //hacer
-
+bool Game::youLose(){ 
+    Block* squares = current->getBlocks();
+    int cantidadBloques = current->getNumberBlocks();
+    for(int i = 0; i< cantidadBloques; i++){
+        if(squares[i].getY() < 0){
+            return true;
+        }
+    }
     return false;
 }
 
-bool Game::lowerCurrent(){ //colision con los colores 
+bool Game::lowerCurrent(){ 
     Block* squares = current->getBlocks();
     int cantidadBloques = current->getNumberBlocks();
 
@@ -112,6 +148,38 @@ bool Game::lowerCurrent(){ //colision con los colores
         int* rgb = blocks[squares[i].getX()][squares[i].getY()+1].getColor();
         if(rgb[0]!=255 || rgb[1]!=255 || rgb[2]!=255){ //collision with other blocks
             return false;
+        }
+    }
+    return true;
+}
+
+bool Game::leftCurrent(){ 
+    Block* squares = current->getBlocks();
+    int cantidadBloques = current->getNumberBlocks();
+
+    for(int i = 0; i < cantidadBloques; i++){
+        if(squares[i].getX()-1>0){
+            int* rgb = blocks[squares[i].getX()-1][squares[i].getY()].getColor();
+            if(rgb[0]!=255 || rgb[1]!=255 || rgb[2]!=255){ //collision with other blocks
+                return false;
+            }
+            delete[] rgb;
+        }
+    }
+    return true;
+}
+
+bool Game::rightCurrent(){ 
+    Block* squares = current->getBlocks();
+    int cantidadBloques = current->getNumberBlocks();
+
+    for(int i = 0; i < cantidadBloques; i++){
+        if(squares[i].getX()+1<=COLUMNS){ 
+            int* rgb = blocks[squares[i].getX()+1][squares[i].getY()].getColor();
+            if(rgb[0]!=255 || rgb[1]!=255 || rgb[2]!=255){ //collision with other blocks
+                return false;
+            }
+            delete[] rgb;
         }
     }
     return true;
@@ -127,12 +195,16 @@ void Game::input(){
     if(keyStates[SDL_SCANCODE_F]) fullScreen = !fullScreen; //si apreto la tecla F
     if(keyStates[SDL_SCANCODE_LEFT]){
         if(current != NULL){
-            current->moveLeft();
+            if(this->leftCurrent()){
+                current->moveLeft();
+            }
         }
     }
     if(keyStates[SDL_SCANCODE_RIGHT]){
         if(current != NULL){
-            current->moveRight();
+            if(this->rightCurrent()){
+                current->moveRight();
+            }
         }
     }
     //if(keyStates[SDL_SCANCODE_DOWN]){
@@ -171,20 +243,20 @@ void Game::draw(){
     current->draw(renderer);
 
     //draw lines
+    /*
     SDL_SetRenderDrawColor(renderer,0,0,0,255); //white
     int i = 0;
     while(i <= SCREEN_WIDTH){
         SDL_RenderDrawLine(renderer,i,0,i,SCREEN_HEIGHT);
-        //SDL_RenderPresent(renderer);
         i = i+ X_BLOCK_SIZE;
     }
 
     i = 0;
     while(i <= SCREEN_HEIGHT){
         SDL_RenderDrawLine(renderer,0,i,SCREEN_WIDTH,i);
-        //SDL_RenderPresent(renderer);
         i = i+ Y_BLOCK_SIZE;
     }
+    */
 
     SDL_RenderPresent(renderer); //push everything to screen
     
@@ -200,18 +272,31 @@ void Game::draw(){
 void Game::update(){
     if(fullScreen) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     if(!fullScreen) SDL_SetWindowFullscreen(window, 0);
-    //hacer la colision con los demas colores aca y si se puede ahi hago moveDown()
-    bool cont =  this->lowerCurrent(); //implementar esto para hacer el chequeo de colision con los colores
+
+    std::cout << score <<std::endl;
+
+    bool cont =  this->lowerCurrent();
     bool newCurrent = false; //or use cont
     if(cont){
         newCurrent = current->moveDown();
     }
-    if(newCurrent || !cont){ //add current to grid and creante nes current
+    if(newCurrent || !cont){ //add current to grid and create new current
         Block* squares = current->getBlocks();
         for(int i = 0; i< current->getNumberBlocks();i++){
             int* rgb = squares[i].getColor();
             blocks[squares[i].getX()][squares[i].getY()].setColor(rgb[0],rgb[1],rgb[2]);
+            delete[] rgb;
         }
+        //check if there are rows to clear
+        this->clearRow();
+
+
+        //check if we lose
+        if(this->youLose()){
+            this->stop();
+            //change the grid to blood red and sdlWait(1000)
+        }
+
         current->~Tetrominoe();
         current = NULL;
     }

@@ -21,8 +21,12 @@ int main(){
             gameInstance->addTetrominoe(); 
         }
         gameInstance->draw();
-        gameInstance->update();
         gameInstance->input();
+        gameInstance->update();
+
+        //gameInstance->draw();
+        //gameInstance->update();
+        //gameInstance->input();
     }
     gameInstance->~Game();
     return 0;

@@ -28,7 +28,7 @@ void Block::setState(bool s){
     state = s;
 }
 
-int* Block::getColor(){
+int* Block::getColor(){ //remember to implement delete
     int* rgb = new int[3];
     rgb[0] = r;
     rgb[1] = g;
@@ -65,5 +65,5 @@ int Block::getY(){
 }
 
 Block::~Block(){
-    
+    //nothing
 }
