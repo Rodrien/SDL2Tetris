@@ -93,7 +93,7 @@ Tetrominoe* Game::getCurrent(){
     return current;
 }
 
-void Game::clearRow(){ //this can be optimized (X,Y), not working how its supposed to
+void Game::clearRow(){ //this can be optimized (X,Y), possible bugs incoming
     //bottom row number is ROWS
     int primerFila = 0;
     int go = 0;
@@ -116,9 +116,9 @@ void Game::clearRow(){ //this can be optimized (X,Y), not working how its suppos
         }
         rowSelected--;
     }
-    while(go!=0){ //lower the rest of the rows, here error, where should it start??
+    while(go!=0){ //lower the rest of the rows
         this->growScore(1);
-        for(int i = ROWS-1; i > 0; i--){
+        for(int i = primerFila; i > 0; i--){
             for(int j = 0; j < COLUMNS; j++){
                 int* rgb = blocks[j][i-1].getColor();
                 blocks[j][i].setColor(rgb[0],rgb[1],rgb[2]);
