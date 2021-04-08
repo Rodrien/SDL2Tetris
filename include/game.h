@@ -14,7 +14,7 @@ class Game{
     private:
     SDL_Renderer* renderer;
     SDL_Window* window;
-    bool running, fullScreen;
+    bool running, fullScreen, withLines;
     int lastFrame, fps, frameCount, lastTime;
     int score;
     Block blocks[COLUMNS][ROWS];
@@ -36,7 +36,7 @@ class Game{
     bool youLose(); 
     void clearRow(); //para cuando toca limpiar la fila
     void lowerAll(); //lower the grid after clearing
-    
+
     void setLastFrame(int);
     void setLastTime(int);
     void setFPS(int);

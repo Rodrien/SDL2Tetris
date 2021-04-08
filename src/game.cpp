@@ -3,7 +3,7 @@
 
 Game::Game(){
     maxFPS = 10;
-    running = false;
+    running = withLines = fullScreen = false;
     score = lastFrame = fps = frameCount = 0;
     current = NULL;
 
@@ -18,8 +18,6 @@ Game::~Game(){}
 
 void Game::start(){
     running = true;
-    fullScreen = false;
-    score = lastFrame = fps = frameCount = 0;
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         printf("Error empezando SDL: %s\n", SDL_GetError());
     }
@@ -95,8 +93,9 @@ Tetrominoe* Game::getCurrent(){
     return current;
 }
 
-void Game::clearRow(){ //this can be optimized (X,Y)
+void Game::clearRow(){ //this can be optimized (X,Y), not working how its supposed to
     //bottom row number is ROWS
+    int primerFila = 0;
     int go = 0;
     int rowSelected = ROWS-1;
     while(rowSelected >= 0){ 
@@ -110,13 +109,14 @@ void Game::clearRow(){ //this can be optimized (X,Y)
         }
         if(add){
             go++;
+            if(primerFila == 0) primerFila = rowSelected;
             for(int i = 0; i< COLUMNS; i++){
                 blocks[i][rowSelected].setColor(255,255,255); //make the row white
             }
         }
         rowSelected--;
     }
-    while(go!=0){ //lower the rest of the rows
+    while(go!=0){ //lower the rest of the rows, here error, where should it start??
         this->growScore(1);
         for(int i = ROWS-1; i > 0; i--){
             for(int j = 0; j < COLUMNS; j++){
@@ -193,6 +193,7 @@ void Game::input(){
     const Uint8 *keyStates = SDL_GetKeyboardState(NULL);
     if(keyStates[SDL_SCANCODE_ESCAPE]) running = false; //si apreto la tecla de escape
     if(keyStates[SDL_SCANCODE_F]) fullScreen = !fullScreen; //si apreto la tecla F
+    if(keyStates[SDL_SCANCODE_L]) withLines = !withLines; //si apreto la tecla F
     if(keyStates[SDL_SCANCODE_LEFT]){
         if(current != NULL){
             if(this->leftCurrent()){
@@ -243,20 +244,20 @@ void Game::draw(){
     current->draw(renderer);
 
     //draw lines
-    /*
-    SDL_SetRenderDrawColor(renderer,0,0,0,255); //white
-    int i = 0;
-    while(i <= SCREEN_WIDTH){
-        SDL_RenderDrawLine(renderer,i,0,i,SCREEN_HEIGHT);
-        i = i+ X_BLOCK_SIZE;
-    }
+    if(withLines){
+        SDL_SetRenderDrawColor(renderer,0,0,0,255); //white
+        int i = 0;
+        while(i <= SCREEN_WIDTH){
+            SDL_RenderDrawLine(renderer,i,0,i,SCREEN_HEIGHT);
+            i = i+ X_BLOCK_SIZE;
+        }
 
-    i = 0;
-    while(i <= SCREEN_HEIGHT){
-        SDL_RenderDrawLine(renderer,0,i,SCREEN_WIDTH,i);
-        i = i+ Y_BLOCK_SIZE;
+        i = 0;
+        while(i <= SCREEN_HEIGHT){
+            SDL_RenderDrawLine(renderer,0,i,SCREEN_WIDTH,i);
+            i = i+ Y_BLOCK_SIZE;
+        }
     }
-    */
 
     SDL_RenderPresent(renderer); //push everything to screen
     
